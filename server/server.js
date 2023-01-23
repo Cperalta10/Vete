@@ -3,11 +3,18 @@ const app = express();
 const path = require("path");
 const { logger } = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const corsOptions = require("./config/corsOptions");
 const PORT = process.env.PORT || 3500;
 
 app.use(express.json()); // lets our app recieve and parse json data
 
+app.use(cookieParser());
+
 app.use(logger);
+
+app.use(cors(corsOptions)); // available to public
 
 app.use("/", express.static(path.join(__dirname, "public"))); // telling express where to find static files like css files or other resources like an image that we would use in the server.
 
@@ -23,5 +30,7 @@ app.all("*", (req, res) => {
         res.type("txt").send("404 Not Found");
     }
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
